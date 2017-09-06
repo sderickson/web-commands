@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>Remote Commands</title>
+</head>
+<body>
+
+<script>
+    function runCommand (url) {
+        let password = localStorage.getItem('password');
+        options = {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ password })
+        }
+        fetch(url, options);
+    }
+</script>
+
+<button onclick="runCommand('/pwd')">pwd</button>
+
+</body>
+</html>

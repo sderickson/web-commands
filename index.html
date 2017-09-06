@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+
+<script>
+    function setPassword () {
+        localStorage.setItem('password', document.getElementById('password').value);
+        document.location.href = '/commands';
+    }
+</script>
+
+<input type="password" name="password" id="password" />
+<button onclick="setPassword()">Moving On</button>
+
+</body>
+</html>
