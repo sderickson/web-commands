@@ -14,9 +14,17 @@
         }
         fetch(url, options);
     }
+    
+    let ws = new WebSocket('ws://localhost:8080');
+    ws.onmessage = (message) => {
+        let el = document.getElementById('logs');
+        el.innerHTML += message.data;
+    }
 </script>
 
 <button onclick="runCommand('/pwd')">pwd</button>
+<pre id="logs">
+</pre>
 
 </body>
 </html>

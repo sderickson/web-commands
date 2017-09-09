@@ -8,11 +8,28 @@ const { spawn } = require('child_process');
 
 var logs = [];
 
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+
+  ws.send(logs.join(''));
+});
+
 const addToLogs = function (cssClass) {
   return (data) => {
     let lines = data.toString().split('\n');
     lines = lines.map((l) => `<div class="${cssClass}">${l}</div>`)
     logs = logs.concat(lines);
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(lines.join(''));
+      }
+    });
   }
 };
 
@@ -23,10 +40,11 @@ var server = http.createServer(function (request, response) {
       const child = spawn.apply(this, urls[request.url]);
       child.stdout.pipe(response);
       child.stdout.on('data', addToLogs('log'));
+      child.stderr.on('data', addToLogs('err'));
     }
     else if (request.url === '/logs') {
       response.writeHead(200, {"Content-Type": "text/html"});
-      response.end(`<pre>${logs.join('')}</pre>`)
+      response.end(`<pre>${logs.join('')}</pre>`);
     }
     else if (request.url === '/commands') {
       response.writeHead(200, {"Content-Type": "text/html"});
