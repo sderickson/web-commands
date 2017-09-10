@@ -1,9 +1,8 @@
 var http = require('http');
 var fs = require('fs');
-console.log(__dirname+'/main.html');
 var indexHtml = fs.readFileSync(__dirname+'/index.html');
 var commandsHtml = fs.readFileSync(__dirname+'/commands.html');
-const urls = require('./urls');
+const urls = require('./commands');
 const { spawn } = require('child_process');
 _ = require('lodash');
 
@@ -39,9 +38,9 @@ var server = http.createServer(function (request, response) {
     if (urls[request.url]) {
       response.writeHead(200, {"Content-Type": "text/plain"});
       const child = spawn.apply(this, urls[request.url]);
-      child.stdout.pipe(response);
       child.stdout.on('data', addToLogs('log'));
       child.stderr.on('data', addToLogs('err'));
+      response.end('');
     }
     else if (request.url === '/logs') {
       response.writeHead(200, {"Content-Type": "text/html"});
