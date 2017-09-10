@@ -35,7 +35,7 @@ const addToLogs = function (cssClass) {
 
 var server = http.createServer(function (request, response) {
   try {
-    if (urls[request.url]) {
+    if (urls[request.url] && request.method === 'POST') {
       response.writeHead(200, {"Content-Type": "text/plain"});
       const child = spawn.apply(this, urls[request.url]);
       child.stdout.on('data', addToLogs('log'));
