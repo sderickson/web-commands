@@ -16,13 +16,38 @@
     }
     
     let ws = new WebSocket('ws://localhost:8080');
+    window.allData = '';
+    let newData = false;
     ws.onmessage = (message) => {
-        let el = document.getElementById('logs');
-        el.innerHTML += message.data;
+        window.allData += message.data;
+        if (window.allData.length > MAX_DATA) {
+            window.allData = window.allData.slice(window.allData.length - MAX_DATA);
+        }
+        newData = true;
     }
+    const MAX_DATA = 100000;
+    setInterval(function() {
+        if (!newData) {
+            return;
+        }
+        let atBottom = false;
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            atBottom = true;
+        }
+        let el = document.getElementById('logs');
+        el.innerHTML = allData;
+        if (atBottom) {
+            window.scrollTo(0,document.body.scrollHeight);
+        }
+        newData = false;
+    }, 100);
+    
+    
 </script>
 
-<button onclick="runCommand('/pwd')">pwd</button>
+<div>
+    <%= buttons %>
+</div>
 <pre id="logs">
 </pre>
 

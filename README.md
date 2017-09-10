@@ -5,7 +5,6 @@ terminal commands on the host.
 
 # TODO
 
-* /commands page shows list of commands from urls.json
 * Change urls.json to commands.json
 * Limit url commands to POST
 * Add SSL

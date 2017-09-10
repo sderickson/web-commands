@@ -5,6 +5,7 @@ var indexHtml = fs.readFileSync(__dirname+'/index.html');
 var commandsHtml = fs.readFileSync(__dirname+'/commands.html');
 const urls = require('./urls');
 const { spawn } = require('child_process');
+_ = require('lodash');
 
 var logs = [];
 
@@ -48,7 +49,10 @@ var server = http.createServer(function (request, response) {
     }
     else if (request.url === '/commands') {
       response.writeHead(200, {"Content-Type": "text/html"});
-      response.end(commandsHtml);
+      let buttons = Object.keys(urls).map((key) => {
+        return `<button onclick="runCommand('${key}')">${urls[key][0]}</button>`;
+      });
+      response.end(_.template(commandsHtml)({ buttons: buttons.join('<br>') }));
     }
     else {
       response.writeHead(200, {"Content-Type": "text/html"});

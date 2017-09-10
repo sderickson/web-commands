@@ -1,4 +1,5 @@
 {
   "/pwd": ["pwd", []],
-  "/ls": ["ls", ["-lh"]]
+  "/ls": ["ls", ["-lh"]],
+  "/find-html": ["find", ["../", "-name", "'*.html'"], { "shell": true }]
 }

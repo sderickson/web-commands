@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/sderickson/web-commands#readme",
   "dependencies": {
+    "lodash": "^4.17.4",
     "ws": "^3.1.0"
   }
 }
