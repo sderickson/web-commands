@@ -3,18 +3,49 @@
     <title>Remote Commands</title>
     <script src="https://unpkg.com/vue@2.4.2/dist/vue.js"></script>
 </head>
+
+<style>
+    *, *:before, *:after {
+        box-sizing: border-box;
+    }
+    
+    body {
+        margin: 0;
+        background: lightblue;
+    }
+    
+    #buttons {
+        padding: 5px;
+        width: 100%;
+        background: black;
+        position: fixed;
+        height: 30px;
+        top: 0;
+    }
+    
+    #logs {
+        padding: 30px 10px 0;
+        color: darkblue;
+        margin: 0;
+    }
+    
+    .log.err {
+        color: darkred;
+    }
+    
+</style>
 <body>
 
 <div id="app">
-    <div>
+    <div id="buttons">
         <%= buttons %>
-        <button v-on:click="atBottom = !atBottom">
-            <span v-if="atBottom">✓</span>
-            Scroll To Bottom
+        <button v-on:click="scroll = !scroll">
+            <span v-if="scroll">&#x2713;</span>
+            Scroll
         </button>
     </div>
-    <pre>
-        <div v-for="log in logs">{{log.d}}</div>
+    <pre id="logs">
+        <div v-for="log in logs" v-bind:class="{ log: true, err: log.t==='err' }">{{log.d}}</div>
     </pre>
 </div>
 
@@ -35,10 +66,10 @@
         el: '#app',
         data: {
             logs: [],
-            atBottom: true
+            scroll: true
         },
         updated: function () {
-            if(this.atBottom) {
+            if(this.scroll) {
                 window.scrollTo(0,document.body.scrollHeight);
             }
         }
