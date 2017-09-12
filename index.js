@@ -1,7 +1,5 @@
 var https = require('https');
 var fs = require('fs');
-var indexHtml = fs.readFileSync(__dirname+'/index.html');
-var commandsHtml = fs.readFileSync(__dirname+'/commands.html');
 const urls = require('./commands');
 const { spawn } = require('child_process');
 _ = require('lodash');
@@ -28,6 +26,7 @@ wss.on('connection', function connection(ws) {
 const addToLogs = function (cssClass) {
   return (data) => {
     let lines = data.toString().split('\n');
+    lines = lines.filter((l) => l);
     lines = lines.map((l) => { return { t: cssClass, d: l } });
     logs = logs.concat(lines);
     wss.clients.forEach(function each(client) {
@@ -60,13 +59,15 @@ var server = https.createServer(options, function (request, response) {
       });
     }
     else if (request.url === '/commands') {
+      var commandsHtml = fs.readFileSync(__dirname+'/commands.html');
       response.writeHead(200, {"Content-Type": "text/html"});
       let buttons = Object.keys(urls).map((key) => {
         return `<button onclick="runCommand('${key}')">${urls[key][0]}</button>`;
       });
-      response.end(_.template(commandsHtml)({ buttons: buttons.join('<br>') }));
+      response.end(_.template(commandsHtml)({ buttons: buttons.join(' ') }));
     }
     else {
+      var indexHtml = fs.readFileSync(__dirname+'/index.html');
       response.writeHead(200, {"Content-Type": "text/html"});
       response.end(indexHtml);
     }
