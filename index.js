@@ -22,17 +22,17 @@ wss.on('connection', function connection(ws) {
     console.log('received: %s', message);
   });
 
-  ws.send(logs.join(''));
+  ws.send(JSON.stringify(logs));
 });
 
 const addToLogs = function (cssClass) {
   return (data) => {
     let lines = data.toString().split('\n');
-    lines = lines.map((l) => `<div class="${cssClass}">${l}</div>`)
+    lines = lines.map((l) => { return { t: cssClass, d: l } });
     logs = logs.concat(lines);
     wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(lines.join(''));
+        client.send(JSON.stringify(lines));
       }
     });
   }

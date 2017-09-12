@@ -1,8 +1,22 @@
 <html>
 <head>
     <title>Remote Commands</title>
+    <script src="https://unpkg.com/vue@2.4.2/dist/vue.js"></script>
 </head>
 <body>
+
+<div id="app">
+    <div>
+        <%= buttons %>
+        <button v-on:click="atBottom = !atBottom">
+            <span v-if="atBottom">✓</span>
+            Scroll To Bottom
+        </button>
+    </div>
+    <pre>
+        <div v-for="log in logs">{{log.d}}</div>
+    </pre>
+</div>
 
 <script>
     function runCommand (url) {
@@ -16,40 +30,31 @@
     }
     
     let ws = new WebSocket('ws://localhost:8080');
-    window.allData = '';
-    let newData = false;
+
+    var logsEl = new Vue({
+        el: '#app',
+        data: {
+            logs: [],
+            atBottom: true
+        },
+        updated: function () {
+            if(this.atBottom) {
+                window.scrollTo(0,document.body.scrollHeight);
+            }
+        }
+    })
+
+    const MAX_DATA = 2000;
+
     ws.onmessage = (message) => {
-        window.allData += message.data;
-        if (window.allData.length > MAX_DATA) {
-            window.allData = window.allData.slice(window.allData.length - MAX_DATA);
+        lines = JSON.parse(message.data);
+        logsEl.logs = logsEl.logs.concat(lines);
+        if (logsEl.logs.length > MAX_DATA) {
+            logsEl.logs = logsEl.logs.slice(logsEl.logs.length - MAX_DATA);
         }
-        newData = true;
     }
-    const MAX_DATA = 100000;
-    setInterval(function() {
-        if (!newData) {
-            return;
-        }
-        let atBottom = false;
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-            atBottom = true;
-        }
-        let el = document.getElementById('logs');
-        el.innerHTML = allData;
-        if (atBottom) {
-            window.scrollTo(0,document.body.scrollHeight);
-        }
-        newData = false;
-    }, 100);
-    
     
 </script>
-
-<div>
-    <%= buttons %>
-</div>
-<pre id="logs">
-</pre>
 
 </body>
 </html>
