@@ -18,6 +18,7 @@
   "homepage": "https://github.com/sderickson/web-commands#readme",
   "dependencies": {
     "lodash": "^4.17.4",
+    "parse-body": "^1.0.3",
     "ws": "^3.1.0"
   }
 }

@@ -1,10 +1,15 @@
-var http = require('http');
+var https = require('https');
 var fs = require('fs');
 var indexHtml = fs.readFileSync(__dirname+'/index.html');
 var commandsHtml = fs.readFileSync(__dirname+'/commands.html');
 const urls = require('./commands');
 const { spawn } = require('child_process');
 _ = require('lodash');
+const key = fs.readFileSync('server.key').toString();
+const cert = fs.readFileSync('server.crt').toString();
+const pwd = _.trim(fs.readFileSync('pwd').toString());
+const options = { key, cert };
+const parseBody = require('parse-body');
 
 var logs = [];
 
@@ -33,18 +38,26 @@ const addToLogs = function (cssClass) {
   }
 };
 
-var server = http.createServer(function (request, response) {
+var server = https.createServer(options, function (request, response) {
   try {
     if (urls[request.url] && request.method === 'POST') {
-      response.writeHead(200, {"Content-Type": "text/plain"});
-      const child = spawn.apply(this, urls[request.url]);
-      child.stdout.on('data', addToLogs('log'));
-      child.stderr.on('data', addToLogs('err'));
-      response.end('');
-    }
-    else if (request.url === '/logs') {
-      response.writeHead(200, {"Content-Type": "text/html"});
-      response.end(`<pre>${logs.join('')}</pre>`);
+      parseBody(request, 1e6, function(err, body) {
+        if (err) {
+          response.writeHead(401);
+          response.end('');
+          return console.log(err);
+        }
+        if(body.password !== pwd) {
+          console.log('body.password', body.password !== pwd)
+          response.writeHead(401);
+          return response.end('');
+        }
+        response.writeHead(200, {"Content-Type": "text/plain"});
+        const child = spawn.apply(this, urls[request.url]);
+        child.stdout.on('data', addToLogs('log'));
+        child.stderr.on('data', addToLogs('err'));
+        response.end('');
+      });
     }
     else if (request.url === '/commands') {
       response.writeHead(200, {"Content-Type": "text/html"});

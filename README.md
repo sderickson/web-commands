@@ -5,6 +5,4 @@ terminal commands on the host.
 
 # TODO
 
-* Add SSL
-* Implement password check on server
 * Improve UX
